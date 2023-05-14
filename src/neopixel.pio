@@ -1,0 +1,36 @@
+.program neopixel
+
+; WS2812B timings
+;
+; ------------
+;            |
+; 0          |
+;            ------------------------
+;
+; ------------------------
+;                        |
+; 1                      |
+;                        ------------
+;
+; |<-------->|<--------->|<-------->|
+;    4 c/c       4 c/c       4 c/c
+;        (c/c = clock cycles)
+;    0.4us       0.4us       0.4us
+
+.define public T1 4
+
+.side_set 1
+
+loop:
+  out x 1 side 0 [T1 - 1]
+  jmp !x do_zero side 1 [T1 - 1]
+do_one:
+  jmp loop side 1 [T1 - 1]
+do_zero:
+  nop side 0 [T1 - 1]
+
+% c-sdk {
+
+void neopixel_program_init(PIO pio, uint sm, uint offset, uint pin, float freq);
+
+%}
